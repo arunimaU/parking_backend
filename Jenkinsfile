@@ -1,148 +1,90 @@
+pipeline {
+agent any
 
-pipeline{
+stages {
+/**Insurance-Backend Pipeline Job Build and Test stages **/
+stage('SCM Checkout') {
+steps {
+git url:'https://github.com/arunimaU/parking_backend.git'
+}
+}
+stage('Build') {
+steps {
+         sh"/opt/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true "
+}
+}
 
-    agent any
+          
 
-    stages{
+stage('Deploy') {
+steps {
+                     sh"/opt/apache-maven-3.6.3/bin/mvn clean deploy -Dmaven.test.skip=true "
+}
+}
+stage('Release') {
+steps {
+                    sh"export JENKINS_NODE_COOKIE=dontKillMe; nohup java -jar $WORKSPACE/target/*.jar &"
+}
+}
 
-       
+ stage('SIT Approval'){
 
-         stage('Getting Code From GitHub')
+ steps{
 
-      {
+ slackSend baseUrl: 'https://hooks.slack.com/services/', channel: 'slackjenkins', color: 'bad', message: 'war file created', tokenCredentialId: 'arunimaslack', username: 'arunimauniyal'
 
-        steps {
+ }
 
-              git 'https://github.com/arunimaU/parking_backend.git'
+ }
 
-              }
+        stage('Please Provide Approval for SIT Deployment ?'){
 
-      }
+          steps{
 
-        stage('Build'){
+            script{
 
-            steps{
+                def userInput
 
-             sh '/opt/maven/bin/mvn clean package'
+  try {
 
-            }
+    userInput = input(
 
-        }
+        id: 'Proceed1', message: 'SIT Deployment Approval', parameters: [
 
- 
+        [$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please Confirm you agree with this']
 
-        stage( 'email' ){
+        ])
 
-            steps{
+} catch(err) {
 
-                emailext (
+    def user = err.getCauses()[0].getUser()
 
- 
+    userInput = false
 
-  subject: "Waiting for your Approval! Job: '${env.JOB_NAME} [${env.BUILD_NUMBER}]'",
-
- 
-
-  body: """<p>STARTED: Job '${env.JOB_NAME} [${env.BUILD_NUMBER}]':</p>
-
- 
-
-              <p>Check console output at &QUOT;<a href='${env.BUILD_URL}'>${env.JOB_NAME} [${env.BUILD_NUMBER}]</a>&QUOT;</p>""",to: 'arunimauniyal@gmail.com'
-
- 
-
- 
-
- 
-
-)
-
-            }
-
-        }
-
-                stage("Stage with input") {
-
- 
-
-    steps {
-
- 
-
-     
-
- 
-
-        script {
-
- 
-
-            def userInput = input(id: 'Proceed1', message: 'Promote build?', parameters: [[$class: 'BooleanParameterDefinition', defaultValue: true, description: '', name: 'Please confirm you agree with this']])
-
- 
-
-            echo 'userInput: ' + userInput
-
- 
-
- 
-
- 
-
-            if(userInput == true) {
-
- 
-
-                // do action
-
- 
-
-            } else {
-
- 
-
-                // not do action
-
- 
-
-                echo "Action was aborted."
-
- 
-
-            }
-
- 
-
- 
-
- 
-
-        }  
-
- 
-
-    }
-
- 
+    echo "Aborted by: [${user}]"
 
 }
 
-       
-
-        stage('Copy jar and application.property file to Ansible Server'){
-
-            steps{
-
-             sshPublisher(publishers: [sshPublisherDesc(configName: 'LocalAnsible', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'ansible-playbook backend_deploy.yml', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
-
-            }
+          }
 
         }
 
-       
+        }
 
-       
+          stage('Deployment-SIT'){
 
-    }
+            steps{
 
+                sshPublisher(publishers: [sshPublisherDesc(configName: 'server', transfers: [sshTransfer(cleanRemote: false, excludes: '', execCommand: 'ansible-playbook  backend_input1.yml', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])
+
+            }
+
+          }
+
+
+
+
+
+}
+    
 }
