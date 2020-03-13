@@ -67,7 +67,7 @@ steps {
 
            }
 
-
+           }
           stage('Deployment-UAT'){
 
             steps{
