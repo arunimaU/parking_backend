@@ -4,7 +4,7 @@ agent any
 stages {
            stage('Git uiCheckout'){
                 steps{
-                    git 'https://github.com/arunimaU/parking_frontend.git'
+                    git branch: 'development' url: '//github.com/arunimaU/parking_frontend.git'
                 }
             }
             stage('Build ui') {
@@ -20,27 +20,14 @@ stages {
                     sh 'curl -u admin:admin http://13.127.197.181:8888/manager/reload?path=/build'
                 }
             }
-         
-         
-         
-         
-         
-         
-         
-         
-         
-/**Insurance-Backend Pipeline Job Build and Test stages **/
-stage('SCM development Checkout') {
+
+stage('Build Backend') {
 steps {
-git branch: 'development', url: 'https://github.com/arunimaU/parking_backend.git'
-}
-}
-stage('Build') {
-steps {
+        git branch: 'development', url: 'https://github.com/arunimaU/parking_backend.git'
          sh"/opt/apache-maven-3.6.3/bin/mvn clean package -Dmaven.test.skip=true "
 }
 }
- stage('SIT Approval'){
+ stage('Email notification'){
 
  steps{
 
@@ -49,17 +36,11 @@ steps {
  }
 
  }
-
-        stage('Please Provide Approval for SIT Deployment ?'){
-
-          steps{
-
-            script{
-
-                def userInput
-
+ stage('Please Provide Approval for UAT Deployment ?'){
+ steps{
+ script{
+  def userInput
   try {
-
     userInput = input(
 
         id: 'Proceed1', message: 'SIT Deployment Approval', parameters: [
@@ -86,7 +67,7 @@ steps {
 
           
 
-stage('Deploy') {
+stage('Deploy Artifact') {
 steps {
                      sh"/opt/apache-maven-3.6.3/bin/mvn clean deploy -Dmaven.test.skip=true "
 }
@@ -97,7 +78,7 @@ steps {
 }
 }
 
-          stage('Deployment-SIT'){
+          stage('Deployment-UAT'){
 
             steps{
 
@@ -105,11 +86,6 @@ steps {
 ''', execTimeout: 120000, flatten: false, makeEmptyDirs: false, noDefaultExcludes: false, patternSeparator: '[, ]+', remoteDirectory: '', remoteDirectorySDF: false, removePrefix: '', sourceFiles: '')], usePromotionTimestamp: false, useWorkspaceInPromotion: false, verbose: false)])       }
 
           }
-
-
-
-
-
 }
     
 }
