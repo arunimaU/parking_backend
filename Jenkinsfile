@@ -2,19 +2,19 @@ pipeline {
 agent any
 
 stages {
-           stage('Git Checkout'){
+           stage('Git uiCheckout'){
                 steps{
                     git 'https://github.com/arunimaU/parking_frontend.git'
                 }
             }
-            stage('Build') {
+            stage('Build ui') {
                 steps{
                     sh 'npm install'
                     sh 'npm run build'
    
                 }
             }
-            stage('Deploy'){
+            stage('Deploy ui'){
                 steps{
                     sh 'cp -r $WORKSPACE/build /opt/apache-tomcat-9.0.31/webapps'
                     sh 'curl -u admin:admin http://13.127.197.181:8888/manager/reload?path=/build'
@@ -32,7 +32,7 @@ stages {
 /**Insurance-Backend Pipeline Job Build and Test stages **/
 stage('SCM development Checkout') {
 steps {
-git branch:'development','https://github.com/arunimaU/parking_backend.git'
+git branch: 'development', url: 'https://github.com/arunimaU/parking_backend.git'
 }
 }
 stage('Build') {
