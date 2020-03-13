@@ -30,9 +30,9 @@ stages {
          
          
 /**Insurance-Backend Pipeline Job Build and Test stages **/
-stage('SCM Checkout') {
+stage('SCM development Checkout') {
 steps {
-git url:'https://github.com/arunimaU/parking_backend.git'
+git branch: 'development', url: 'https://github.com/arunimaU/parking_backend.git'
 }
 }
 stage('Build') {
