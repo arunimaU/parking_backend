@@ -2,9 +2,9 @@ pipeline {
 agent any
 
 stages {
-           stage('Git uiCheckout'){
+           stage('SCM Checkout'){
                 steps{
-                    git branch: 'development' url: '//github.com/arunimaU/parking_frontend.git'
+                    git branch: 'development' , url: '//github.com/arunimaU/parking_frontend.git'
                 }
             }
             stage('Build ui') {
