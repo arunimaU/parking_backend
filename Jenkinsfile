@@ -63,16 +63,17 @@ steps {
 
         }
 
-        
-
-
-          stage('Deployment-UAT'){
-                    steps {
+           stage('Deployment in sit'){
+           steps {
                      sh"/opt/apache-maven-3.6.3/bin/mvn clean deploy -Dmaven.test.skip=true "
 }
 steps {
                     sh"export JENKINS_NODE_COOKIE=dontKillMe; nohup java -jar $WORKSPACE/target/*.jar &"
-} 
+}    
+           }
+
+
+          stage('Deployment-UAT'){
 
             steps{
 
