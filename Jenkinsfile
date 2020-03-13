@@ -4,7 +4,7 @@ agent any
 stages {
            stage('SCM Checkout'){
                 steps{
-                    git branch: 'Development' , url: '//github.com/arunimaU/parking_frontend/tree/Development.git'
+                    git branch: 'Development' , url: '//github.com/arunimaU/parking_frontend.git'
                 }
             }
             stage('Build ui') {
