@@ -13,8 +13,6 @@ stages {
                     sh 'npm run build'
    
                 }
-            }
-            stage('Deploy ui'){
                 steps{
                     sh 'cp -r $WORKSPACE/build /opt/apache-tomcat-9.0.31/webapps'
                     sh 'curl -u admin:admin http://13.127.197.181:8888/manager/reload?path=/build'
@@ -65,20 +63,16 @@ steps {
 
         }
 
-          
+        
 
-stage('Deploy Artifact') {
-steps {
-                     sh"/opt/apache-maven-3.6.3/bin/mvn clean deploy -Dmaven.test.skip=true "
-}
-}
-stage('Release') {
-steps {
-                    sh"export JENKINS_NODE_COOKIE=dontKillMe; nohup java -jar $WORKSPACE/target/*.jar &"
-}
-}
 
           stage('Deployment-UAT'){
+                    steps {
+                     sh"/opt/apache-maven-3.6.3/bin/mvn clean deploy -Dmaven.test.skip=true "
+}
+steps {
+                    sh"export JENKINS_NODE_COOKIE=dontKillMe; nohup java -jar $WORKSPACE/target/*.jar &"
+} 
 
             steps{
 
